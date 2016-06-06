@@ -8,7 +8,6 @@ import com.shaoyang.architecture.model.remote.http.RetrofitService;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.functions.Func1;
 
 /**
@@ -17,11 +16,10 @@ import rx.functions.Func1;
 public class MovieModel {
     /**
      * 用于获取豆瓣电影Top250的数据
-     * @param subscriber  由调用者传过来的观察者对象
      * @param start 起始位置
      * @param count 获取长度
      */
-    public Observable<HttpResult<List<Subject>>> getTopMovie(Subscriber<List<Subject>> subscriber, int start, int count){
+    public Observable<HttpResult<List<Subject>>> getTopMovie( int start, int count){
 
         MovieService movieService = RetrofitService.getInstance().createRetrofit().create(MovieService.class);
         Observable observable = movieService.getTopMovie(start, count)
