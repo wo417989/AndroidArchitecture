@@ -2,15 +2,20 @@ package com.shaoyang.architecture.model.remote.http;
 
 import android.support.annotation.NonNull;
 
+import com.orhanobut.logger.Logger;
 import com.shaoyang.architecture.MyApplication;
 import com.shaoyang.architecture.utils.NetUtil;
-import com.squareup.okhttp.OkHttpClient;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by shaoyang on 2016/6/3.
@@ -25,7 +30,7 @@ public class RetrofitService {
     protected static final String CACHE_CONTROL_NETWORK = "max-age=0";
 
     private static OkHttpClient mOkHttpClient;
-    private static final int DEFAULT_TIMEOUT = 10;
+    private static final int DEFAULT_TIMEOUT = 20;
 
     private RetrofitService() {
     }
@@ -93,19 +98,56 @@ public class RetrofitService {
 //                    }
 //                }
 //            };
-            mOkHttpClient = new OkHttpClient();
+//            mOkHttpClient = new OkHttpClient();
 //            mOkHttpClient.setCache(cache);
 //            mOkHttpClient.networkInterceptors().add(rewriteCacheControlInterceptor);
 //            mOkHttpClient.interceptors().add(rewriteCacheControlInterceptor);
-            mOkHttpClient.setConnectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+//            mOkHttpClient.setConnectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+            // Log信息
+//            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+//            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
             //okhttp 3
-//                    mOkHttpClient = new OkHttpClient.Builder().cache(cache)
-//                            .addNetworkInterceptor(rewriteCacheControlInterceptor)
-//                            .addInterceptor(rewriteCacheControlInterceptor)
-//                            .connectTimeout(30, TimeUnit.SECONDS).build();
+            mOkHttpClient = new OkHttpClient.Builder()
+            .addInterceptor(new LoggingInterceptor())
+            .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).build();
 
         }
     }
+
+    static class LoggingInterceptor implements Interceptor {
+        @Override public Response intercept(Interceptor.Chain chain) throws IOException {
+            Request request = chain.request();
+
+            long t1 = System.nanoTime();
+//            Log.e("Sending request ",request.url()+" " +chain.connection()+" " +request.headers());
+            Logger.e("Sending request url:%s on %s%n header:%s%n body:%s%n",
+                    request.url(), chain.connection(), request.headers() ,request.body());
+            try {
+                Logger.json("response json string: " +(request.body()==null?"":request.body().toString()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            logger.info(String.format("Sending request %s on %s%n%s",
+//                    request.url(), chain.connection(), request.headers()));
+
+            Response response = chain.proceed(request);
+
+            long t2 = System.nanoTime();
+//            Log.e("Received response for ","url:" + response.request().url()+" " +(t2 - t1) / 1e6d+" \n header: " +response.headers() +" \n code:"+response.code() +" \n body " +response.body());
+            Logger.e("Received response for url:%s in %.1fms%n header:%s%n code:%s%n body:%s%n",
+                    response.request().url(), (t2 - t1) / 1e6d, response.headers() ,response.code(), response.body());
+            try {
+                Logger.json("response json string: " +(response.body()==null?"":response.body().toString()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            logger.info(String.format("Received response for %s in %.1fms%n%s",
+//                    response.request().url(), (t2 - t1) / 1e6d, response.headers()));
+
+            return response;
+        }
+    }
+
     /**
      * 根据网络状况获取缓存的策略
      *

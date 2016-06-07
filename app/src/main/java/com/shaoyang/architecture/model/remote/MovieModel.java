@@ -23,7 +23,7 @@ public class MovieModel {
 
         MovieService movieService = RetrofitService.getInstance().createRetrofit().create(MovieService.class);
         Observable observable = movieService.getTopMovie(start, count)
-                .map(new HttpResultFunc<List<Subject>>());
+                .map(new HttpResultFunc<HttpResult<List<Subject>>>());
 
         return observable;
     }
@@ -38,16 +38,17 @@ public class MovieModel {
     /**
      * 用来统一处理Http的resultCode,并将HttpResult的Data部分剥离出来返回给subscriber
      *
-     * @param <T>   Subscriber真正需要的数据类型，也就是Data部分的数据类型
+     *  Subscriber真正需要的数据类型，也就是Data部分的数据类型
      */
-    private class HttpResultFunc<T> implements Func1<HttpResult<T>, T> {
+    private class HttpResultFunc<T> implements Func1<T, T> {
 
         @Override
-        public T call(HttpResult<T> httpResult) {
-            if (httpResult.getCount() == 0) {
+        public T call(T httpResult) {
+            HttpResult<List<Subject>> httpResultNew= (HttpResult<List<Subject>>)httpResult;
+            if (httpResultNew.getCount() == 0) {
                 throw new ApiException(100);
             }
-            return httpResult.getSubjects();
+            return (T)httpResultNew;
         }
     }
 }

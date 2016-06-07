@@ -28,7 +28,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Logger.init().logLevel(LogLevel.FULL);
+        Logger.init("Architecture").logLevel(LogLevel.FULL);
         instance = (MyApplication) getApplicationContext();
 //        this.enabledStrictMode();
 //        ToastUtils.register(this);

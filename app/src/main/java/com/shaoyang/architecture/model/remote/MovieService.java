@@ -5,8 +5,8 @@ import com.shaoyang.architecture.model.entity.Subject;
 
 import java.util.List;
 
-import retrofit.http.GET;
-import retrofit.http.Query;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**

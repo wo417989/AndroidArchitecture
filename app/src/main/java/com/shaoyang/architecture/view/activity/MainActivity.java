@@ -7,8 +7,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.ProgressBarCircularIndeterminate;
+import com.rey.material.widget.ProgressView;
 import com.shaoyang.architecture.R;
+import com.shaoyang.architecture.model.entity.HttpResult;
 import com.shaoyang.architecture.model.entity.Subject;
 import com.shaoyang.architecture.presenter.MoviePresenter;
 import com.shaoyang.architecture.view.MovieView;
@@ -27,8 +28,8 @@ public class MainActivity extends AppCompatActivity implements MovieView {
     Button clickMeBN;
     @Bind(R.id.result_TV)
     TextView resultTV;
-    @Bind(R.id.progressBarCircularIndeterminate)
-    ProgressBarCircularIndeterminate progressBarCircularIndeterminate;
+    @Bind(R.id.progress_pv_circular_inout)
+    ProgressView progress_pv_circular_inout;
 
     private MoviePresenter moviePresenter;
 
@@ -52,8 +53,8 @@ public class MainActivity extends AppCompatActivity implements MovieView {
     }
 
     @Override
-    public void showMovies(List<Subject> subjects) {
-        resultTV.setText(subjects.toString());
+    public void showMovies(HttpResult<List<Subject>> result) {
+        resultTV.setText(result.getSubjects().toString());
     }
 
     @Override
@@ -69,12 +70,12 @@ public class MainActivity extends AppCompatActivity implements MovieView {
 
     @Override
     public void showLoadingView() {
-        progressBarCircularIndeterminate.setVisibility(View.VISIBLE);
+        progress_pv_circular_inout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideLoadingView() {
-        progressBarCircularIndeterminate.setVisibility(View.GONE);
+        progress_pv_circular_inout.setVisibility(View.GONE);
     }
 
     @Override
@@ -85,5 +86,11 @@ public class MainActivity extends AppCompatActivity implements MovieView {
     @Override
     public void showNetworkError() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ButterKnife.unbind(this);
     }
 }

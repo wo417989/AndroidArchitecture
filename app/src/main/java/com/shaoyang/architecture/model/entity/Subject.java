@@ -97,7 +97,7 @@ public class Subject {
         this.images = images;
     }
 
-    private class Cast{
+    public class Cast{
         private String id;
         private String name;
         private String alt;
@@ -141,7 +141,7 @@ public class Subject {
         }
     }
 
-    private class Avatars{
+    public class Avatars{
         private String small;
         private String medium;
         private String large;

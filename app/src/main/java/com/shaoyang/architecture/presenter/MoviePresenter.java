@@ -1,5 +1,7 @@
 package com.shaoyang.architecture.presenter;
 
+import com.orhanobut.logger.Logger;
+import com.shaoyang.architecture.model.entity.HttpResult;
 import com.shaoyang.architecture.model.entity.Subject;
 import com.shaoyang.architecture.model.remote.MovieModel;
 import com.shaoyang.architecture.presenter.subscriber.DefaultSubscriber;
@@ -18,7 +20,13 @@ public class MoviePresenter implements Presenter{
 
     private MovieModel movieModel = new MovieModel();
     private MovieView movieView;
+    public MoviePresenter() {
+    }
     public MoviePresenter(MovieView movieView) {
+        this.movieView = movieView;
+    }
+
+    public void setView(MovieView movieView) {
         this.movieView = movieView;
     }
     /**
@@ -34,7 +42,7 @@ public class MoviePresenter implements Presenter{
                 .subscribe(new MovieListSubscriber());
     }
 
-    private final class MovieListSubscriber extends DefaultSubscriber<List<Subject>> {
+    private final class MovieListSubscriber extends DefaultSubscriber<HttpResult<List<Subject>>> {
         @Override
         public void onCompleted() {
             movieView.hideLoadingView();
@@ -47,7 +55,8 @@ public class MoviePresenter implements Presenter{
         }
 
         @Override
-        public void onNext(List<Subject> subjects) {
+        public void onNext(HttpResult<List<Subject>> subjects) {
+            Logger.e("http result:"+ subjects.toString());
             movieView.showMovies(subjects);
         }
 
