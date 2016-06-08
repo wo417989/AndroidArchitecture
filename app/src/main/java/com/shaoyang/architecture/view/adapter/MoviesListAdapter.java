@@ -1,6 +1,7 @@
 package com.shaoyang.architecture.view.adapter;
 
 import android.app.Activity;
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.shaoyang.architecture.R;
+import com.shaoyang.architecture.databinding.MovieItemBinding;
 import com.shaoyang.architecture.model.entity.Subject;
-import com.shaoyang.architecture.utils.GlideUtil;
 
 import java.util.List;
 
@@ -84,10 +85,14 @@ public class MoviesListAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_ITEM) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_movie_list, parent, false);
-            ItemViewHolder vh = new ItemViewHolder(v);
+//            MovieItemBinding binding = MovieItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false); //usage 1
+            MovieItemBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.movie_item, parent, false); //usage 2
+            ItemViewHolder vh = new ItemViewHolder(binding.getRoot() ,binding);
             return vh;
+//            View v = LayoutInflater.from(parent.getContext())
+//                    .inflate(R.layout.item_movie_list, parent, false);
+//            ItemViewHolder vh = new ItemViewHolder(v);
+//            return vh;
         } else {
             View view = LayoutInflater.from(parent.getContext()).inflate(
                     R.layout.list_footer, null);
@@ -102,16 +107,25 @@ public class MoviesListAdapter extends RecyclerView.Adapter {
         if (holder instanceof ItemViewHolder) {
             Subject subject = subjects.get(position);
             ItemViewHolder holder1 = (ItemViewHolder) holder;
-
-            if (subject.getImages() != null) {
-                GlideUtil.loadImage(context, subject.getImages().getMedium(), holder1.imageView);
+            MovieItemBinding binding;
+            if (null != holder1.itemView) {
+                binding = DataBindingUtil.getBinding(holder1.itemView);
             } else {
-                GlideUtil.loadImage(context, "", holder1.imageView);
+                binding = holder1.getBinding();
             }
-            holder1.title.setText(subject.getTitle());
-            if (subject.getCasts() != null && subject.getCasts().size() > 0) {
-                holder1.desc.setText("主演："+subject.getCasts().get(0).getName());
+            if (null != binding) {
+                binding.setSubject(subject);
+                binding.executePendingBindings();
             }
+//            if (subject.getImages() != null) {
+//                GlideUtil.loadImage(context, subject.getImages().getMedium(), holder1.imageView);
+//            } else {
+//                GlideUtil.loadImage(context, "", holder1.imageView);
+//            }
+//            holder1.title.setText(subject.getTitle());
+//            if (subject.getCasts() != null && subject.getCasts().size() > 0) {
+//                holder1.desc.setText("主演："+subject.getCasts().get(0).getName());
+//            }
         }
     }
 
@@ -148,11 +162,19 @@ public class MoviesListAdapter extends RecyclerView.Adapter {
         @Bind(R.id.tv_title)
         TextView title;
 
-        public ItemViewHolder(View itemView) {
+        MovieItemBinding binding;
+
+        public ItemViewHolder(View itemView ,MovieItemBinding binding) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            this.binding = binding;
         }
+
+        public MovieItemBinding getBinding(){
+            return this.binding;
+        }
+
 
         @Override
         public void onClick(View v) {

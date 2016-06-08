@@ -47,7 +47,8 @@ public class MainListActivity extends BaseActivity  {
     @OnClick(R.id.click_me_BN)
     public void onClick() {
         if (null != movieListFragment) {
-            movieListFragment.setPresenter(new MoviePresenter());
+            MoviePresenter moviePresenter = new MoviePresenter();
+            movieListFragment.setPresenter(moviePresenter);
             movieListFragment.setView();
             movieListFragment.getMovie(0, 10);
         }

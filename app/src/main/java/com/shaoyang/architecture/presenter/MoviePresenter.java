@@ -20,8 +20,11 @@ public class MoviePresenter implements Presenter{
 
     private MovieModel movieModel = new MovieModel();
     private MovieView movieView;
+    private int state;
+
     public MoviePresenter() {
     }
+
     public MoviePresenter(MovieView movieView) {
         this.movieView = movieView;
     }

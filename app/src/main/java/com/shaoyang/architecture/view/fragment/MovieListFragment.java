@@ -18,6 +18,7 @@ import com.shaoyang.architecture.model.entity.Subject;
 import com.shaoyang.architecture.presenter.MoviePresenter;
 import com.shaoyang.architecture.view.MovieView;
 import com.shaoyang.architecture.view.adapter.MoviesListAdapter;
+import com.shaoyang.architecture.viewmode.MovieViewModel;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -50,6 +51,8 @@ public class MovieListFragment extends Fragment implements MovieView {
     public static final int countPerPage = 10;
     private boolean isCanLoadMore = false; //是否能加载更多
 
+    private MovieViewModel movieViewModel;
+
     public MovieListFragment() {
         // Required empty public constructor
     }
@@ -61,6 +64,7 @@ public class MovieListFragment extends Fragment implements MovieView {
 
     public void setPresenter( MoviePresenter moviePresenter) {
         this.moviePresenter = moviePresenter;
+        this.movieViewModel = new MovieViewModel(getActivity().getApplicationContext() , moviePresenter);
     }
 
     public void setView() {
@@ -85,7 +89,7 @@ public class MovieListFragment extends Fragment implements MovieView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        contentView = inflater.inflate(R.layout.fragment_movie_list, container, false);
+        contentView = inflater.inflate(R.layout.fragment_movie_list_new, container, false);
         ButterKnife.bind(this,contentView);
 
         initRecyclerView();
@@ -206,11 +210,15 @@ public class MovieListFragment extends Fragment implements MovieView {
     @Override
     public void showLoadingView() {
         progress_pv_circular_inout_fragment.setVisibility(View.VISIBLE);
+//        moviePresenter.setState(ConstantVar.REQUESTING_STATE);
+//        movieViewModel.setStateVar(1);
     }
 
     @Override
     public void hideLoadingView() {
         progress_pv_circular_inout_fragment.setVisibility(View.GONE);
+//        moviePresenter.setState(ConstantVar.REQUEST_COMPLETE_STATE);
+//        movieViewModel.setStateVar(0);
     }
 
     @Override
